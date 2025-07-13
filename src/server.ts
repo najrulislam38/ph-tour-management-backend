@@ -1,20 +1,18 @@
 /* eslint-disable no-console */
 import { Server } from "http";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import app from "./app";
+import { envVariables } from "./config/env";
 
 let server: Server;
 
-dotenv.config();
-
 const startServer = async () => {
   try {
-    const mongoUrl = process.env.MONGODB_URL;
-    const port = process.env.PORT;
+    const mongoUrl = envVariables.DB_URL;
+    const port = envVariables.PORT;
 
     if (!mongoUrl) {
-      throw new Error("MONGODB_URL environment variable is not defined.");
+      throw new Error("DB_URL environment variable is not defined.");
     }
     await mongoose.connect(mongoUrl);
 
