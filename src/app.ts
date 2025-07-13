@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { router } from "./app/routes";
+import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 
 const app = express();
 
@@ -19,5 +20,7 @@ app.get("/", (req: Request, res: Response) => {
     message: "Welcome to the PH Tour Management Application",
   });
 });
+
+app.use(globalErrorHandler);
 
 export default app;
