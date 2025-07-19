@@ -4,17 +4,54 @@ import httpStatus from "http-status-codes";
 import { UserServices } from "./user.service";
 import { catchAsync } from "../../utilities/catchAsync";
 import { sendResponse } from "../../utilities/sendResponse";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { verifiedToken } from "../../utilities/jwt";
+import { envVariables } from "../../../config/env";
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { name, email } = req.body;
-    const user = await UserServices.createUser({ name, email });
+    const user = await UserServices.createUser(req.body);
 
-    res.status(httpStatus.CREATED).json({
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
       success: true,
-      message: "User created successfully.",
+      message: "User created successfully. from send response handler",
       data: user,
     });
+
+    // res.status(httpStatus.CREATED).json({
+    //   success: true,
+    //   message: "User created successfully.",
+    //   data: user,
+    // });
+  }
+);
+
+const updateUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id;
+    // const token = req.headers.authorization;
+    // const verifiedToked = verifiedToken(
+    //   token as string,
+    //   envVariables.JWT_ACCESS_SECRET
+    // ) as JwtPayload;
+    const verifiedToked = req.user;
+
+    const payload = req.body;
+    const user = await UserServices.updateUser(userId, payload, verifiedToked);
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: "User updated successfully.",
+      data: user,
+    });
+
+    // res.status(httpStatus.CREATED).json({
+    //   success: true,
+    //   message: "User created successfully.",
+    //   data: user,
+    // });
   }
 );
 
@@ -53,4 +90,5 @@ const getAllUsers = catchAsync(
 export const UserController = {
   createUser,
   getAllUsers,
+  updateUser,
 };
