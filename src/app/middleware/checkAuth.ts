@@ -23,6 +23,8 @@ export const checkAuth =
         throw new AppError(404, "You are not permitted to view this route");
       }
 
+      req.user = verifiedToked;
+
       next();
     } catch (error) {
       next(error);
