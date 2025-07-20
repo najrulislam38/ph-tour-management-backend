@@ -64,7 +64,28 @@ const getNewAccessToken = async (
   });
 };
 
+const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const decodedToken = req.user;
+
+  const oldPassword = req.body.oldPassword;
+  const newPassword = req.body.newPassword;
+
+  await AuthServices.resetPassword(oldPassword, newPassword, decodedToken);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Password changed successfully.",
+    data: null,
+  });
+};
+
 export const AuthControllers = {
   credentialLogin,
   getNewAccessToken,
+  resetPassword,
 };
