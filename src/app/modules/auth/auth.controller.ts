@@ -119,7 +119,11 @@ const googleCallbackController = async (
 ) => {
   const user = req.user;
   // console.log("user", user);
+  let redirectTo = req.query.state ? (req.query.state as string) : "";
 
+  if (redirectTo.startsWith("/")) {
+    redirectTo = redirectTo.slice(1);
+  }
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
@@ -134,7 +138,7 @@ const googleCallbackController = async (
   //   data: null,
   // });
 
-  res.redirect(envVariables.FRONTEND_URL);
+  res.redirect(`${envVariables.FRONTEND_URL}/${redirectTo}`);
 };
 
 export const AuthControllers = {

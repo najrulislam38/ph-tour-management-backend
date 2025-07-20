@@ -38,7 +38,11 @@ const updateUser = catchAsync(
     const verifiedToked = req.user;
 
     const payload = req.body;
-    const user = await UserServices.updateUser(userId, payload, verifiedToked);
+    const user = await UserServices.updateUser(
+      userId,
+      payload,
+      verifiedToked as JwtPayload
+    );
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
