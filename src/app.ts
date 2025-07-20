@@ -6,6 +6,7 @@ import notFound from "./app/middleware/notFound";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import expressSession from "express-session";
+import "./config/passport";
 
 const app = express();
 

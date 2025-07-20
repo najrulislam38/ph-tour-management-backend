@@ -6,6 +6,8 @@ import httpStatus from "http-status-codes";
 import AppError from "../../errorHelpers/AppError";
 import { setAuthCookie } from "../../utilities/setCookie";
 import { JwtPayload } from "jsonwebtoken";
+import { createUserTokens } from "../../utilities/userTokens";
+import { envVariables } from "../../../config/env";
 
 const credentialLogin = async (
   req: Request,
@@ -110,9 +112,35 @@ const resetPassword = async (
   });
 };
 
+const googleCallbackController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = req.user;
+  // console.log("user", user);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const tokenInfo = createUserTokens(user);
+  setAuthCookie(res, tokenInfo);
+
+  // sendResponse(res, {
+  //   statusCode: httpStatus.OK,
+  //   success: true,
+  //   message: "Password changed successfully.",
+  //   data: null,
+  // });
+
+  res.redirect(envVariables.FRONTEND_URL);
+};
+
 export const AuthControllers = {
   credentialLogin,
   getNewAccessToken,
   resetPassword,
   logout,
+  googleCallbackController,
 };
