@@ -5,6 +5,7 @@ import { sendResponse } from "../../utilities/sendResponse";
 import httpStatus from "http-status-codes";
 import AppError from "../../errorHelpers/AppError";
 import { setAuthCookie } from "../../utilities/setCookie";
+import { JwtPayload } from "jsonwebtoken";
 
 const credentialLogin = async (
   req: Request,
@@ -59,8 +60,29 @@ const getNewAccessToken = async (
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "User logged in successfully.",
+    message: "New Access token retrieved successfully.",
     data: tokeInfo,
+  });
+};
+
+const logout = async (req: Request, res: Response, next: NextFunction) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User Logged out successfully.",
+    data: null,
   });
 };
 
@@ -74,7 +96,11 @@ const resetPassword = async (
   const oldPassword = req.body.oldPassword;
   const newPassword = req.body.newPassword;
 
-  await AuthServices.resetPassword(oldPassword, newPassword, decodedToken);
+  await AuthServices.resetPassword(
+    oldPassword,
+    newPassword,
+    decodedToken as JwtPayload
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -88,4 +114,5 @@ export const AuthControllers = {
   credentialLogin,
   getNewAccessToken,
   resetPassword,
+  logout,
 };
