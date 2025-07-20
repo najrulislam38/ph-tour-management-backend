@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { AuthServices } from "./auth.services";
 import { sendResponse } from "../../utilities/sendResponse";
 import httpStatus from "http-status-codes";
+import AppError from "../../errorHelpers/AppError";
 
 const credentialLogin = async (
   req: Request,
@@ -10,6 +11,16 @@ const credentialLogin = async (
   next: NextFunction
 ) => {
   const loggedInfo = await AuthServices.credentialLogin(req.body);
+
+  res.cookie("accessToken", loggedInfo.accessToken, {
+    httpOnly: true,
+    secure: false,
+  });
+
+  res.cookie("refreshToken", loggedInfo.refreshToken, {
+    httpOnly: true,
+    secure: false,
+  });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -24,8 +35,15 @@ const getNewAccessToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  // const refreshToken = req.cookies.refreshToken;
-  const refreshToken = req.headers.authorization;
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "No refresh token received from cookies."
+    );
+  }
+  // const refreshToken = req.headers.authorization;
   const tokeInfo = await AuthServices.getNewAccessToken(refreshToken as string);
 
   sendResponse(res, {
