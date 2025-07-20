@@ -4,29 +4,32 @@ import { AuthServices } from "./auth.services";
 import { sendResponse } from "../../utilities/sendResponse";
 import httpStatus from "http-status-codes";
 import AppError from "../../errorHelpers/AppError";
+import { setAuthCookie } from "../../utilities/setCookie";
 
 const credentialLogin = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const loggedInfo = await AuthServices.credentialLogin(req.body);
+  const loginInfo = await AuthServices.credentialLogin(req.body);
 
-  res.cookie("accessToken", loggedInfo.accessToken, {
-    httpOnly: true,
-    secure: false,
-  });
+  // res.cookie("accessToken", loggedInfo.accessToken, {
+  //   httpOnly: true,
+  //   secure: false,
+  // });
 
-  res.cookie("refreshToken", loggedInfo.refreshToken, {
-    httpOnly: true,
-    secure: false,
-  });
+  // res.cookie("refreshToken", loggedInfo.refreshToken, {
+  //   httpOnly: true,
+  //   secure: false,
+  // });
+
+  setAuthCookie(res, loginInfo);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "User logged in successfully.",
-    data: loggedInfo,
+    data: loginInfo,
   });
 };
 
@@ -45,6 +48,13 @@ const getNewAccessToken = async (
   }
   // const refreshToken = req.headers.authorization;
   const tokeInfo = await AuthServices.getNewAccessToken(refreshToken as string);
+
+  // res.cookie("accessToken", tokeInfo.accessToken, {
+  //   httpOnly: true,
+  //   secure: false,
+  // });
+
+  setAuthCookie(res, tokeInfo);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
