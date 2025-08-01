@@ -1,20 +1,49 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from "express";
 import { AuthServices } from "./auth.services";
 import { sendResponse } from "../../utilities/sendResponse";
-import httpStatus from "http-status-codes";
+import httpStatus, { StatusCodes } from "http-status-codes";
 import AppError from "../../errorHelpers/AppError";
 import { setAuthCookie } from "../../utilities/setCookie";
 import { JwtPayload } from "jsonwebtoken";
 import { createUserTokens } from "../../utilities/userTokens";
 import { envVariables } from "../../../config/env";
+import passport from "passport";
 
 const credentialLogin = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const loginInfo = await AuthServices.credentialLogin(req.body);
+  // const loginInfo = await AuthServices.credentialLogin(req.body);
+
+  passport.authenticate("local", async (err: any, user: any, info: any) => {
+    if (err) {
+      return next(new AppError(401, err));
+    }
+
+    if (!user) {
+      return next(new AppError(401, info.message));
+    }
+
+    const userTokens = await createUserTokens(user);
+
+    const { password: pass, ...rest } = user.toObject();
+
+    setAuthCookie(res, userTokens);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User logged in successfully.",
+      data: {
+        accessToken: userTokens.accessToken,
+        refreshToken: userTokens.refreshToken,
+        user: rest,
+      },
+    });
+  })(req, res, next);
 
   // res.cookie("accessToken", loggedInfo.accessToken, {
   //   httpOnly: true,
@@ -25,15 +54,6 @@ const credentialLogin = async (
   //   httpOnly: true,
   //   secure: false,
   // });
-
-  setAuthCookie(res, loginInfo);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "User logged in successfully.",
-    data: loginInfo,
-  });
 };
 
 const getNewAccessToken = async (

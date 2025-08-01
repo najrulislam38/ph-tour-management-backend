@@ -5,12 +5,12 @@ import bcrypt from "bcryptjs";
 
 export const seedSuperAdmin = async () => {
   try {
-    const isSuperUserExist = await User.findOne({
-      email: envVariables.SUPER_USER_EMAIL,
+    const isSuperAdminExist = await User.findOne({
+      email: envVariables.SUPER_ADMIN_EMAIL,
     });
 
-    if (isSuperUserExist) {
-      console.log("Super user already exist.");
+    if (isSuperAdminExist) {
+      console.log("Super admin already exist.");
       return;
     }
 
@@ -18,18 +18,18 @@ export const seedSuperAdmin = async () => {
 
     const authProvider: IAuthProvider = {
       provider: "credentials",
-      providerId: envVariables.SUPER_USER_EMAIL,
+      providerId: envVariables.SUPER_ADMIN_EMAIL,
     };
 
     const hashedPassword = await bcrypt.hash(
-      envVariables.SUPER_USER_PASSWORD,
+      envVariables.SUPER_ADMIN_PASSWORD,
       Number(envVariables.BCRYPT_SALT_ROUND)
     );
 
     const payload: IUser = {
-      name: "Super User",
+      name: "Super Admin",
       role: Role.SUPER_ADMIN,
-      email: envVariables.SUPER_USER_EMAIL,
+      email: envVariables.SUPER_ADMIN_EMAIL,
       isVerified: true,
       password: hashedPassword,
       auths: [authProvider],
