@@ -27,7 +27,7 @@ export enum IsActive {
 export interface IUser {
   _id?: Types.ObjectId;
   name: string;
-  age: number;
+  age?: number;
   email: string;
   password?: string;
   phone?: string;
