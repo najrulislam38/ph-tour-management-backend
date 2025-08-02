@@ -22,6 +22,8 @@ router.post(
   TourController.createTourType
 );
 
+router.get("/tour-types/:name", TourController.getSingleTourType);
+
 router.patch(
   "/tour-types/:id",
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
