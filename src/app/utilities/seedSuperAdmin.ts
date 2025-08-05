@@ -31,6 +31,7 @@ export const seedSuperAdmin = async () => {
       role: Role.SUPER_ADMIN,
       email: envVariables.SUPER_ADMIN_EMAIL,
       phone: "01771523757",
+      address: "Joypurhat",
       isVerified: true,
       password: hashedPassword,
       auths: [authProvider],

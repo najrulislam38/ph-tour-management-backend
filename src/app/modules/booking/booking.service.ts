@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import AppError from "../../errorHelpers/AppError";
 import { User } from "../user/user.mode";
 import { BOOKING_STATUS, IBooking } from "./booking.interface";
@@ -6,6 +7,8 @@ import { Booking } from "./booking.model";
 import { Payment } from "../payment/payment.model";
 import { PAYMENT_STATUS } from "../payment/payment.interface";
 import { Tour } from "../tour/tour.model";
+import { SSLService } from "../sslCommerz/sslCommerz.service";
+import { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
 
 const getTransactionId = () => {
   return `Tran_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
@@ -19,7 +22,7 @@ const createBooking = async (payload: IBooking, userId: string) => {
   try {
     const user = await User.findById(userId);
 
-    if (!user?.phone) {
+    if (!user?.phone || !user?.address) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "Please Update Your Profile to Book a tour"
@@ -66,10 +69,29 @@ const createBooking = async (payload: IBooking, userId: string) => {
       .populate("tour", "title costFrom")
       .populate("payment");
 
+    const userName = (updatedBooking?.user as any).name;
+    const userAddress = (updatedBooking?.user as any).address;
+    const userEmail = (updatedBooking?.user as any).email;
+    const userPhone = (updatedBooking?.user as any).phone;
+
+    const sslPayload: ISSLCommerz = {
+      name: userName,
+      address: userAddress,
+      email: userEmail,
+      phoneNumber: userPhone,
+      amount: amount,
+      transactionId: transactionId,
+    };
+
+    const sslPayment = await SSLService.sslPaymentInit(sslPayload);
+
     await session.commitTransaction();
     session.endSession();
 
-    return updatedBooking;
+    return {
+      paymentUrl: (sslPayment as any).GatewayPageURL,
+      booking: updatedBooking,
+    };
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
