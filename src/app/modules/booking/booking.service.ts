@@ -13,46 +13,68 @@ const getTransactionId = () => {
 
 const createBooking = async (payload: IBooking, userId: string) => {
   const transactionId = getTransactionId();
-  const user = await User.findById(userId);
 
-  if (!user?.phone) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Please Update Your Profile to Book a tour"
+  const session = await Booking.startSession();
+  await session.startTransaction();
+  try {
+    const user = await User.findById(userId);
+
+    if (!user?.phone) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Please Update Your Profile to Book a tour"
+      );
+    }
+
+    const tour = await Tour.findById(payload.tour).select("costFrom");
+
+    if (!tour?.costFrom) {
+      throw new AppError(httpStatus.BAD_REQUEST, "No Tour Cost Found!");
+    }
+
+    const amount = Number(tour.costFrom) * Number(payload.guestCount);
+
+    const booking = await Booking.create(
+      [
+        {
+          ...payload,
+          user: userId,
+          status: BOOKING_STATUS.PENDING,
+        },
+      ],
+      { session }
     );
+
+    const payment = await Payment.create(
+      [
+        {
+          booking: booking[0]._id,
+          status: PAYMENT_STATUS.UNPAID,
+          transactionId: transactionId,
+          amount: amount,
+        },
+      ],
+      { session }
+    );
+
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      booking[0]._id,
+      { payment: payment[0]._id },
+      { new: true, runValidators: true, session }
+    )
+      .populate("user", "name email phone address")
+      .populate("tour", "title costFrom")
+      .populate("payment");
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return updatedBooking;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-
-  const tour = await Tour.findById(payload.tour).select("costFrom");
-
-  if (!tour?.costFrom) {
-    throw new AppError(httpStatus.BAD_REQUEST, "No Tour Cost Found!");
-  }
-
-  const amount = Number(tour.costFrom) * Number(payload.guestCount);
-
-  const booking = await Booking.create({
-    ...payload,
-    user: userId,
-    status: BOOKING_STATUS.PENDING,
-  });
-
-  const payment = await Payment.create({
-    booking: booking._id,
-    status: PAYMENT_STATUS.UNPAID,
-    transactionId: transactionId,
-    amount: amount,
-  });
-
-  const updatedBooking = await Booking.findByIdAndUpdate(
-    booking._id,
-    { payment: payment._id },
-    { new: true, runValidators: true }
-  )
-    .populate("user", "name email phone address")
-    .populate("tour", "title costFrom")
-    .populate("payment");
-
-  return updatedBooking;
 };
 
 const getAllBookings = async () => {
