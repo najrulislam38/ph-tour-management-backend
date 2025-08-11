@@ -5,7 +5,12 @@ import { catchAsync } from "../../utilities/catchAsync";
 import { sendResponse } from "../../utilities/sendResponse";
 
 const createDivision = catchAsync(async (req: Request, res: Response) => {
-  const result = await DivisionService.createDivision(req.body);
+  const payload = {
+    ...req.body,
+    thumbnail: req.file?.path,
+  };
+  const result = await DivisionService.createDivision(payload);
+
   sendResponse(res, {
     statusCode: 201,
     success: true,
