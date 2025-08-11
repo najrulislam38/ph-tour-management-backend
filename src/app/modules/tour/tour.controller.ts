@@ -9,7 +9,6 @@ const createTour = catchAsync(async (req: Request, res: Response) => {
     ...req.body,
     images: (req.files as Express.Multer.File[])?.map((file) => file.path),
   };
-  console.log(payload);
 
   const result = await TourService.createTour(payload);
   sendResponse(res, {

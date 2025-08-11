@@ -13,6 +13,8 @@ const createTour = async (payload: ITour) => {
     throw new Error("A tour with this title already exists.");
   }
 
+  throw new Error("Cloudinary images should have to deleted.");
+
   // const baseSlug = payload.title.toLowerCase().split(" ").join("-")
   // let slug = `${baseSlug}`
 
