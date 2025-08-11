@@ -3,9 +3,10 @@ import { Request, Response } from "express";
 import { DivisionService } from "./division.service";
 import { catchAsync } from "../../utilities/catchAsync";
 import { sendResponse } from "../../utilities/sendResponse";
+import { IDivision } from "./division.interface";
 
 const createDivision = catchAsync(async (req: Request, res: Response) => {
-  const payload = {
+  const payload: IDivision = {
     ...req.body,
     thumbnail: req.file?.path,
   };
