@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import AppError from "../../errorHelpers/AppError";
 // import { IUser } from "../user/user.interface";
@@ -11,6 +12,7 @@ import {
 } from "../../utilities/userTokens";
 import { JwtPayload } from "jsonwebtoken";
 import { envVariables } from "../../../config/env";
+import { IAuthProvider } from "../user/user.interface";
 
 // general credential login implement
 // const credentialLogin = async (payload: Partial<IUser>) => {
@@ -108,7 +110,7 @@ const getNewAccessToken = async (refreshToken: string) => {
   };
 };
 
-const resetPassword = async (
+const changePassword = async (
   oldPassword: string,
   newPassword: string,
   decodedToken: JwtPayload
@@ -131,8 +133,71 @@ const resetPassword = async (
   user!.save();
 };
 
+const resetPassword = async (
+  oldPassword: string,
+  newPassword: string,
+  decodedToken: JwtPayload
+) => {
+  // const user = await User.findById(decodedToken.userId);
+
+  // const isOldPasswordMatch = await bcryptjs.compare(
+  //   oldPassword,
+  //   user!.password as string
+  // );
+
+  // if (!isOldPasswordMatch) {
+  //   throw new AppError(httpStatus.UNAUTHORIZED, "Old password does not match.");
+  // }
+
+  // user!.password = await bcryptjs.hash(
+  //   newPassword,
+  //   Number(envVariables.JWT_ACCESS_SECRET)
+  // );
+  // user!.save();
+
+  return {};
+};
+
+const setPassword = async (userId: string, plainPassword: string) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError(404, "User Not Found!");
+  }
+
+  if (
+    user.password &&
+    user.auths.some((providerObject) => providerObject.provider === "google")
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You have already set your password. Now you can change the password from your profile password update"
+    );
+  }
+
+  const hashedPassword = await bcryptjs.hash(
+    plainPassword,
+    Number(envVariables.BCRYPT_SALT_ROUND)
+  );
+
+  const credentialProvider: IAuthProvider = {
+    provider: "credentials",
+    providerId: user.email,
+  };
+
+  const auths: IAuthProvider[] = [...user.auths, credentialProvider];
+
+  user.auths = auths;
+
+  await user.save();
+
+  return {};
+};
+
 export const AuthServices = {
   // credentialLogin,
   getNewAccessToken,
+  changePassword,
   resetPassword,
+  setPassword,
 };
