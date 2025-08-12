@@ -10,6 +10,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { createUserTokens } from "../../utilities/userTokens";
 import { envVariables } from "../../../config/env";
 import passport from "passport";
+import { catchAsync } from "../../utilities/catchAsync";
 
 const credentialLogin = async (
   req: Request,
@@ -108,21 +109,33 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
-const resetPassword = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const decodedToken = req.user;
+const changePassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const newPassword = req.body.newPassword;
+    const oldPassword = req.body.oldPassword;
+    const decodedToken = req.user;
 
-  const oldPassword = req.body.oldPassword;
-  const newPassword = req.body.newPassword;
+    await AuthServices.changePassword(
+      oldPassword,
+      newPassword,
+      decodedToken as JwtPayload
+    );
 
-  await AuthServices.resetPassword(
-    oldPassword,
-    newPassword,
-    decodedToken as JwtPayload
-  );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Password Changed Successfully",
+      data: null,
+    });
+  }
+);
+
+const setPassword = async (req: Request, res: Response, next: NextFunction) => {
+  const decodedToken = req.user as JwtPayload;
+
+  const { password } = req.body;
+
+  await AuthServices.setPassword(decodedToken.userId, password);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -131,6 +144,37 @@ const resetPassword = async (
     data: null,
   });
 };
+const forgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email } = req.body;
+
+  await AuthServices.forgotPassword(email);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Email Sent Successfully",
+    data: null,
+  });
+};
+
+const resetPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user;
+
+    await AuthServices.resetPassword(req.body, decodedToken as JwtPayload);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Password Reset Successfully",
+      data: null,
+    });
+  }
+);
 
 const googleCallbackController = async (
   req: Request,
@@ -164,7 +208,10 @@ const googleCallbackController = async (
 export const AuthControllers = {
   credentialLogin,
   getNewAccessToken,
+  changePassword,
   resetPassword,
+  setPassword,
+  forgotPassword,
   logout,
   googleCallbackController,
 };
