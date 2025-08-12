@@ -187,6 +187,8 @@ const setPassword = async (userId: string, plainPassword: string) => {
 
   const auths: IAuthProvider[] = [...user.auths, credentialProvider];
 
+  user.password = hashedPassword;
+
   user.auths = auths;
 
   await user.save();
