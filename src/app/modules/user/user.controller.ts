@@ -75,6 +75,35 @@ const getAllUsers = catchAsync(
   }
 );
 
+const getSingleUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+
+    const result = await UserServices.getSingleUser(id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User retrieved successfully.",
+      data: result.data,
+    });
+  }
+);
+const getMe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const decodedToken = req.user as JwtPayload;
+    const result = await UserServices.getMe(decodedToken.userId);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Your profile retrieved successfully.",
+
+      data: result.data,
+    });
+  }
+);
+
 // const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
 //   try {
 //     const users = await UserServices.getAllUsers();
@@ -94,5 +123,7 @@ const getAllUsers = catchAsync(
 export const UserController = {
   createUser,
   getAllUsers,
+  getSingleUser,
   updateUser,
+  getMe,
 };
