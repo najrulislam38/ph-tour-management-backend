@@ -51,7 +51,7 @@ import { sendEmail } from "../../utilities/sendEmail";
 //   // const refreshToken = generateToken(
 //   //   jwtPayload,
 //   //   envVariables.JWT_REFRESH_SECRET,
-//   //   envVariables.JWT_REFRESh_EXPIRES
+//   //   envVariables.JWT_REFRESH_EXPIRES
 //   // );
 
 //   const userTokens = createUserTokens(isUserExist);
