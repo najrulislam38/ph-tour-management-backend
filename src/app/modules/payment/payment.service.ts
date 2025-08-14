@@ -199,9 +199,24 @@ const initPayment = async (bookingId: string) => {
   };
 };
 
+const getInvoiceDownloadUrl = async (paymentId: string) => {
+  const payment = await Payment.findById(paymentId).select("invoiceUrl");
+
+  if (!payment) {
+    throw new AppError(httpStatus.NOT_FOUND, "Payment Not Found");
+  }
+
+  if (!payment.invoiceUrl) {
+    throw new AppError(httpStatus.NOT_FOUND, "Not Invoice Found");
+  }
+
+  return payment.invoiceUrl;
+};
+
 export const PaymentService = {
   successPayment,
   failPayment,
   cancelPayment,
   initPayment,
+  getInvoiceDownloadUrl,
 };
