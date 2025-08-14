@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { uploadBufferToCloudinary } from "../../../config/cloudinary.config";
 import AppError from "../../errorHelpers/AppError";
 import { generatePdf, IInvoiceData } from "../../utilities/invoice";
 import { sendEmail } from "../../utilities/sendEmail";
@@ -53,6 +54,21 @@ const successPayment = async (query: Record<string, string>) => {
     };
 
     const pdfBuffer = await generatePdf(invoiceData);
+
+    const cloudinaryResult = await uploadBufferToCloudinary(
+      pdfBuffer,
+      "invoice"
+    );
+
+    if (!cloudinaryResult) {
+      throw new AppError(401, "Error uploading pdf");
+    }
+
+    await Payment.findByIdAndUpdate(
+      updatedPayment._id,
+      { invoiceUrl: cloudinaryResult.secure_url },
+      { runValidators: true, session }
+    );
 
     await sendEmail({
       to: (updatedBooking.user as unknown as IUser).email,
