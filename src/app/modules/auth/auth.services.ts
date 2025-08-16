@@ -126,7 +126,14 @@ const changePassword = async (
   );
 
   if (!isOldPasswordMatch) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "Old password does not match.");
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Your password does not match."
+    );
+  }
+
+  if (newPassword === oldPassword) {
+    throw new AppError(401, "Old password and new password does not match.");
   }
 
   user!.password = await bcryptjs.hash(
