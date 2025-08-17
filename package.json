@@ -14,13 +14,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@types/ejs": "^3.1.5",
-    "@types/multer": "^2.0.0",
-    "@types/nodemailer": "^6.4.17",
-    "@types/pdfkit": "^0.17.2",
+    
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
-    "cloudinary": "^2.7.0",
+    "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
@@ -41,6 +38,10 @@
     "zod": "^4.0.5"
   },
   "devDependencies": {
+    "@types/ejs": "^3.1.5",
+    "@types/multer": "^2.0.0",
+    "@types/nodemailer": "^6.4.17",
+    "@types/pdfkit": "^0.17.2",
     "@eslint/js": "^9.31.0",
     "@types/axios": "^0.9.36",
     "@types/bcryptjs": "^2.4.6",
