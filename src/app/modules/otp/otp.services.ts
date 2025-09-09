@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { redisClient } from "../../../config/redis.config";
 import { sendEmail } from "../../utilities/sendEmail";
 import AppError from "../../errorHelpers/AppError";
-import { User } from "../user/user.mode";
+import { User } from "../user/user.model";
 
 const OTP_EXPIRATION = 2 * 60; // 2 MINUTES;
 

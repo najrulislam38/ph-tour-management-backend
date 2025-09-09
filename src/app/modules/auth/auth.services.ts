@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
- 
+
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import AppError from "../../errorHelpers/AppError";
 // import { IUser } from "../user/user.interface";
-import { User } from "../user/user.mode";
+import { User } from "../user/user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";

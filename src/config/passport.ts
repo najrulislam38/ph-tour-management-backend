@@ -7,7 +7,7 @@ import {
   VerifyCallback,
 } from "passport-google-oauth20";
 import { envVariables } from "./env";
-import { User } from "../app/modules/user/user.mode";
+import { User } from "../app/modules/user/user.model";
 import { IsActive, Role } from "../app/modules/user/user.interface";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcryptjs from "bcryptjs";

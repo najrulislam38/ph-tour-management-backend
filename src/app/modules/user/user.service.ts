@@ -1,6 +1,6 @@
 import AppError from "../../errorHelpers/AppError";
 import { IAuthProvider, IUser, Role } from "./user.interface";
-import { User } from "./user.mode";
+import { User } from "./user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
 import { envVariables } from "../../../config/env";

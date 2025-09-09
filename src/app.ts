@@ -26,7 +26,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: [envVariables.FRONTEND_URL],
+    origin: [
+      envVariables.FRONTEND_URL,
+      "https://ph-tour-management-system-client.vercel.app",
+    ],
     credentials: true,
   })
 );

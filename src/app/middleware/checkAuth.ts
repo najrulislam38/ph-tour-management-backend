@@ -3,7 +3,7 @@ import AppError from "../errorHelpers/AppError";
 import { verifiedToken } from "../utilities/jwt";
 import { envVariables } from "../../config/env";
 import { JwtPayload } from "jsonwebtoken";
-import { User } from "../modules/user/user.mode";
+import { User } from "../modules/user/user.model";
 import httpStatus from "http-status-codes";
 import { IsActive } from "../modules/user/user.interface";
 
