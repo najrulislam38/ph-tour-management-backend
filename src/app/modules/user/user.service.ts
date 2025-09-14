@@ -1,6 +1,6 @@
 import AppError from "../../errorHelpers/AppError";
 import { IAuthProvider, IUser, Role } from "./user.interface";
-import { User } from "./user.mode";
+import { User } from "./user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
 import { envVariables } from "../../../config/env";
@@ -45,18 +45,24 @@ const updateUser = async (
    * only admin, super admin - role, isDeleted
    */
 
+  if (decodedToken.role === Role.USER || decodedToken.role === Role.GUISE) {
+    if (userId !== decodedToken.userId) {
+      throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
+    }
+  }
+
   const isUserExist = await User.findById(userId);
 
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found!");
   }
 
+  if (decodedToken.role === Role.SUPER_ADMIN && payload.role === Role.ADMIN) {
+    throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
+  }
+
   if (payload.role) {
     if (decodedToken.role === Role.USER || decodedToken.role === Role.GUISE) {
-      throw new AppError(httpStatus.FORBIDDEN, "You are not authorized.");
-    }
-
-    if (payload.role === Role.SUPER_ADMIN && decodedToken.role === Role.ADMIN) {
       throw new AppError(httpStatus.FORBIDDEN, "You are not authorized.");
     }
   }
@@ -67,12 +73,12 @@ const updateUser = async (
     }
   }
 
-  if (payload.password) {
-    payload.password = await bcryptjs.hash(
-      payload.password,
-      Number(envVariables.BCRYPT_SALT_ROUND)
-    );
-  }
+  // if (payload.password) {
+  //   payload.password = await bcryptjs.hash(
+  //     payload.password,
+  //     Number(envVariables.BCRYPT_SALT_ROUND)
+  //   );
+  // }
 
   const newUpdatedUser = await User.findByIdAndUpdate(userId, payload, {
     new: true,

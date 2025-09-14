@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import AppError from "../../errorHelpers/AppError";
 // import { IUser } from "../user/user.interface";
-import { User } from "../user/user.mode";
+import { User } from "../user/user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -51,7 +51,7 @@ import { sendEmail } from "../../utilities/sendEmail";
 //   // const refreshToken = generateToken(
 //   //   jwtPayload,
 //   //   envVariables.JWT_REFRESH_SECRET,
-//   //   envVariables.JWT_REFRESh_EXPIRES
+//   //   envVariables.JWT_REFRESH_EXPIRES
 //   // );
 
 //   const userTokens = createUserTokens(isUserExist);
@@ -126,7 +126,14 @@ const changePassword = async (
   );
 
   if (!isOldPasswordMatch) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "Old password does not match.");
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Your password does not match."
+    );
+  }
+
+  if (newPassword === oldPassword) {
+    throw new AppError(401, "Old password and new password does not match.");
   }
 
   user!.password = await bcryptjs.hash(

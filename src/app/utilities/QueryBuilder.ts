@@ -65,7 +65,7 @@ export class QueryBuilder<T> {
     const totalDocuments = await this.modelQuery.model.countDocuments();
 
     const page = Number(this.query.page) || 1;
-    const limit = Number(this.query.limit) || 5;
+    const limit = Number(this.query.limit) || 10;
 
     const totalPage = Math.ceil(totalDocuments / limit);
 

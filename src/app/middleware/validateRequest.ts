@@ -6,6 +6,10 @@ export const validateRequest =
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // req.body = JSON.parse(req.body.data) || req.body;
+
+      // console.log("Request body", req.body);
+      // console.log("Request data", req.body.data);
+
       if (req.body.data) {
         req.body = JSON.parse(req.body.data);
       }

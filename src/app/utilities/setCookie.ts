@@ -9,13 +9,17 @@ export const setAuthCookie = (res: Response, tokenInfo: AuthTokens) => {
   if (tokenInfo.accessToken) {
     res.cookie("accessToken", tokenInfo.accessToken, {
       httpOnly: true,
-      secure: false,
+      // secure: envVariables.NODE_ENV === "production",
+      secure: true,
+      sameSite: "none",
     });
 
     if (tokenInfo.refreshToken) {
       res.cookie("refreshToken", tokenInfo.refreshToken, {
         httpOnly: true,
-        secure: false,
+        // secure: envVariables.NODE_ENV === "production",
+        secure: true,
+        sameSite: "none",
       });
     }
   }

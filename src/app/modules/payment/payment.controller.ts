@@ -58,9 +58,25 @@ const initPayment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getInvoiceDownloadUrl = catchAsync(
+  async (req: Request, res: Response) => {
+    const { paymentId } = req.params;
+
+    const result = await PaymentService.getInvoiceDownloadUrl(paymentId);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Invoice Download Url Retrieved successfully",
+      data: result,
+    });
+  }
+);
+
 export const PaymentController = {
   successPayment,
   failPayment,
   cancelPayment,
   initPayment,
+  getInvoiceDownloadUrl,
 };
